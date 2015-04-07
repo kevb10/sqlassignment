@@ -50,7 +50,8 @@ extern void my_monthname(sqlite3_context  *context,
             sqlite3_result_error(context, "monthname - invalid format. Please use mm/dd/yyyy", -1);
             return;
         }
-        themonth = (char *)malloc(sizeof(char)*10);
-        sqlite3_result_text(context, themonth, 15, free);
+        themonth = (char *)malloc(sizeof(char)*128);
+        themonth = months[month];
+        sqlite3_result_text(context, themonth, strlen(themonth)+2, free);
     }
 }
