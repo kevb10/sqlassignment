@@ -1,0 +1,34 @@
+#
+#  Full makefile for MAC (includes making SQLITE,
+#  when .load has been deactivated)
+#
+# The shell, normally called sqlite3, is named
+# sqlshell to avoid conflicts.
+#
+#  Version number below may vary
+SQLITE=./sqlite-amalgamation-3080802
+CFLAGS=-I$(SQLITE) -fPIC
+
+all: orafn.dylib sqlshell
+
+orafn.dylib: entry_point.o ora_tan.o sqlite3.o my_monthname.o
+	gcc -g -fPIC -dynamiclib -o orafn.dylib entry_point.o \
+		ora_tan.o my_monthname.o sqlite3.o -lm
+
+entry_point.o: entry_point.c orafn.h
+	gcc -c $(CFLAGS) -o entry_point.o entry_point.c
+
+ora_tan.o: ora_tan.c
+	gcc -c $(CFLAGS) -o ora_tan.o ora_tan.c
+
+my_monthname.o: my_monthname.c
+	gcc -c $(CFLAGS) -o my_monthname.o my_monthname.c
+
+sqlite3.o: $(SQLITE)/sqlite3.c
+	gcc -c $(CFLAGS) -o sqlite3.o $(SQLITE)/sqlite3.c
+
+sqlshell: shell.o sqlite3.o
+	gcc -o sqlshell shell.o sqlite3.o -lm
+
+shell.o: $(SQLITE)/shell.c
+	gcc -c $(CFLAGS) -o shell.o $(SQLITE)/shell.c
